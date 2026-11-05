@@ -7,6 +7,60 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.4.3 — 恢复「插话」，并把 next-step 竞态真正修掉
+
+1.4.2 的 **#85** 把 `prompt()` 一律改成 `followup`，副作用是**输入框的「插话发送」和队列条的「插话」都变成了排队**：点下去执行的是 `inbox.remove(id)` + `followup(message)`，消息被从 `next-turn` 摘掉、又插回同一个 `next-turn`，净状态不变——界面上就是「点了没反应」。
+它声称要消掉的 `steer→next-step` 竞态并没有被消掉：`followup` 同样走 `send(..., "next-turn", true)`，在 `wakeDriver()` 里一样不闩锁 `wakeRequested`，turn 收尾窗口到达的消息照样滞留到下一次发消息才被带出来。
+
+### 修复
+
+| 补丁 | 变化 |
+| --- | --- |
+| **#85** `SESSION_PROMPT_ALWAYS_FOLLOWUP` → `STEER_RESTORE_PROMPT` | 改成**回滚补丁**：命中 1.4.2 写进去的那行，还原成上游 `if (request.mode === "steer") agent.steer(message); else agent.followup(message);`。升级即自动还原，不需要用户手动改文件 |
+| **#86** `SESSION_STEER_ALWAYS_FOLLOWUP` → `STEER_RESTORE_QUEUE` | 删掉「队列 steer → followup」这条改写；保留并补齐回滚：队列 `case "steer"` 回 `agent.steer(message)`，公共 `steer()` 回到上游 `next-step`，连 1.4.2 留下的纯注释尾巴也一并还原 |
+| **#90** `STEER_WAKE_LATCH`（新增） | 在 `agent-loop` 里真正消掉竞态：`wakeDriver()` 在 running 态也闩锁 `wakeRequested`（`!this.phase.abort.signal.aborted`），`cancel()` 无论 `keepInbox` 与否都清闩锁，保证「停止就是停止」 |
+
+展示分组 `followup: [85, 86]` 改为 `steer: [85, 86, 90]`。
+
+### 行为变化
+
+- 「插话发送」恢复插进**当前轮**的下一步（`agent/inbox/spliced {target:"next-step"}`），不再只是排到下一轮。
+- 「排队发送」语义不变：Agent 空闲时仍然走 `followup`。
+- 按「停止」之后，队列里的消息不会因为新的闩锁被自动起新轮跑掉。
+
+### 验证
+
+- `test/gate.mjs` 71 项全过；`test/cwd-variable.mjs` 与基线同样的 2 项在无宿主渲染器环境下失败（改动前后一致，与本 PR 无关）。
+- 在 0.2.1-rc.2 干净宿主上跑 `applyReplacementsToText`：#85/#86 全部 `changed=false`，不误伤。
+- 在 1.4.2 已打过的宿主上跑：`#85 + #86` 把 `api-session-controller`、`agent-loop` **逐字节还原成上游原文**；再跑一次全部 `changed=false`（幂等）。
+- `#90` 打完后 `node --check` 通过，二次应用 `changed=false`（markers 命中即跳过）。
+
+### 合并前的独立复核
+
+合并前我在**本机真实的宿主文件**上把 PR 的每条声明都跑了一遍（`work/tools/verify-pr3.mjs`，25 项，不写宿主）：
+
+| 声明 | 结果 |
+| --- | --- |
+| 干净宿主上 #85/#86 不误伤 | 通过（`changed=false`） |
+| 1.4.2 宿主上逐字节还原 | 通过（与手工还原的上游文本 `===` 相等） |
+| 还原结果仍是合法 JS | 通过（`node --check`） |
+| #85/#86 幂等 | 通过 |
+| #90 命中 `agent-loop`、产物合法、幂等 | 通过 |
+| #90 不碰 `steer()`（那是 #86 的地盘） | 通过（`[dsh-purge-86]` 标记数前后一致） |
+| #90 的闩锁条件保留 `disposed` 例外 | 通过 |
+| `cancel()` 在 `keepInbox` 下也清闩锁 | 通过 |
+| 展示分组无孤儿 id | 通过 |
+
+另外对 #86 做了 3 轮重复应用，产物稳定、不振荡（`true → false → false`）。
+
+### 补充说明
+
+- **#86 去掉了 `skipIfMarked`**：它现在是纯回滚补丁，pattern 只匹配 1.4.2 的产物，上游文本上不命中，所以不需要标记短路；markers 若保留会让「已还原」被误判成「已应用」。
+- **`PATCH_DISPLAY_GROUPS` 改名不影响界面**：设置页的分组按 `layer`（prompt / code / tools / compat / dsh20）聚合，不走这个表；该表只参与 rollup 计数与折叠分桶。
+- **#90 的取舍**：`wakeDriver()` 在 running 态也置位 `wakeRequested`，代价是「turns 之间」多一次 wake 判定。收益是 turn 收尾窗口到达的消息（`turn()` 已 `return false`、`kick()` 尚未 `setPhase(idle)`）不再滞留。`cancel()` 无条件清闩锁，保证「停止就是停止」不被队列续跑破坏。
+
+---
+
 ## 1.4.2 — 移除输入框里的「回退」按钮及其全部作用
 
 ### 移除内容
