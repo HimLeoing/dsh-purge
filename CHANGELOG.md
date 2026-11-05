@@ -1,9 +1,56 @@
 # 变更记录 / Changelog
 
 对照基线：**1.2.0**（上游最后一代，`dshTarget: 0.2.1-rc.2`）。
-本文件只记 1.3.x / 1.4.x 分支相对 1.2.0 的**新增、优化、修复**，以及会影响到你的行为变化。
+本文件只记 1.3.x / 1.4.x / 1.5.x 分支相对 1.2.0 的**新增、优化、修复**，以及会影响到你的行为变化。
 
 Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes on top of it.
+
+---
+
+## 1.5.0 — 适配 DeepSeek Harness **0.2.2-rc.1**
+
+`dshTarget` 从 `0.2.1-rc.2` 抬到 `0.2.2-rc.1`。0.2.2 把几个包重新拆分了（PTC 执行器独立成包、审批流水线拆出 `lib/pipeline.js`、deliverable 提示词独立成包、`editIntent`/`deleteIntent` 抽出公共 `requirePresent()`），导致 1.4.3 的 6 条锚点整条失配、1 条变成**半应用**。本版把锚点全部对齐，并把 0.2.2 新增的删除门也纳入清洗范围。
+
+### 修复：失配锚点（0.2.1 能打、0.2.2 打不上）
+
+| 补丁 | 0.2.2 里的变化 | 修法 |
+| --- | --- | --- |
+| **#14** `ESCALATION_GRANT_UNCONDITIONAL` | `displayReason` 内联对象被抽成 `escalationDisplayReason(mode, justification)` | 新增一条匹配新形态的 pattern，保留旧 pattern |
+| **#17** `FS_OBSERVATION_INTENT_FREE` | `editIntent` 被压成 `return this.requirePresent(target, actor, "edit")`；**结果是 write 已放行、edit 仍要求先读**（半应用） | 新增 editIntent 新形态 pattern，半应用状态消除 |
+| **#54** `DELIVERABLE_DO_NOT` | 提示词搬到新包 `dsh-deliverable-file-references` | `file` 改为「新包优先、旧包兜底」 |
+| **#60** `OFFICIAL_RUN_CODE_APPROVAL_NEUTRAL` | run_code/PTC 提示词搬到新包 `dsh-tool-executor-ptc` | 同上，并新增 `ptc-executor` 目标映射 |
+| **#62** `OFFICIAL_TOOL_ASK_FAILOPEN` | 审批逻辑拆到 `dsh-tools/lib/pipeline.js`（编译版用 `void 0`、`unavailable` 分支深一层缩进） | 新增 `dsh-tools-pipeline` / `dsh-tools-pipeline-types` 映射 + 两条新 pattern |
+| **#67** `AGENT_LOOP_MESSAGES_GUARD` | turn 循环多嵌一层，缩进 4 tab → **5 tab** | 新增 5-tab 版 pattern |
+| **#74** `ASSEMBLE_BEFORE_PRESTEP` | `assemble()` 改成对象字面量，`model.current()` 紧跟 `inbox.claim()` | 插入点改到 selection 之前，新增对应 pattern |
+
+### 新增
+
+| 补丁 | 说明 |
+| --- | --- |
+| **#91** `FS_DELETE_INTENT_FREE` | 0.2.2 新增 `deleteIntent()`，与 `editIntent` 同族但 1.4.3 的 #17 从没覆盖过。独立成一条可选补丁（不动 #17 的 marker 语义），删除不再要求「先读过」 |
+
+### 预期跳过（不是失败）
+
+| 补丁 | 为什么该跳 |
+| --- | --- |
+| **#71** `LIANGSHEN_IDENTITY_LINE` | 目标 `preset-liangshen` 只在装了「两神」预设时存在，未装即 `missing_file` |
+| **#80** `MINIMAL_OFFICIAL_TOOLSET` | **回滚型**：作用是撤掉 1.4.2 往 minimal 预设里加的 fs/web 行，干净上游本来就没有这些行 |
+| **#86** `STEER_RESTORE_QUEUE` | **回滚型**：同上，撤 1.4.2 的 steer 改写 |
+
+### 安装源
+
+`repository` / `homepage` / `bugs` / `dsh.install` 全部指向本分支 `HimLeoing/dsh-purge-plus`（分支 `main`）。此前这些字段指向上游 `YuJunZhiXue/dsh-purge`，装下去拿到的是上游包，本分支的修复不会生效。
+
+### 验证
+
+- `node test/gate.mjs`：**71 项全过**
+- 7 个修复补丁在 0.2.2-rc.1 宿主上逐个 `apply` → `applied`；二次 `apply` 全部 `already`（幂等）
+- 8 个被改写的宿主文件 `node --check` 全部通过
+- 全量状态：applied 67 · skipped 2（#80/#86 回滚型）· missing_file 1（#71）· na 若干（surface 不适用）
+
+### 升级提示
+
+从 1.4.3 升到 1.5.0 后，**先重启一次 dsh**（补丁表在进程启动时加载），再进「设置 → Purge」确认状态；`#54/#60/#62` 在此之前可能仍显示 skipped，属正常。
 
 ---
 
