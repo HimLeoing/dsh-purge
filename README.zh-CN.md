@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.5.4 · 本分支 fork</strong> · 适配 DSH <strong>0.2.2-rc.1</strong></p>
+<p align="center"><strong>Version 1.5.5 · 本分支 fork</strong> · 适配 DSH <strong>0.2.2-rc.1</strong></p>
 
 > **这是 fork，不是上游。** 原项目：[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)，原作者 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)），MIT 许可证（`Copyright (c) 2026 小杨`，本仓库原样保留）。
 > 本分支由 **[@JeffKeeping](https://github.com/JeffKeeping)** 维护，只做 **0.2.1 / 0.2.2 适配 + 破甲内核升级 + 界面重做 + 补丁锚点修复**，不改变插件用途与能力范围。
@@ -12,6 +12,7 @@
 > 1.4.0 的审批档位 / 审计流水 / 严格 JSON / 修订号借鉴了 [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5)，来源与边界见 [NOTICE.md](NOTICE.md)。
 > **1.4.1 修掉「装完就报 unknown prompt variable {{cwd}}」**：0.2.1 只注册 provider / model，本插件已补注册 cwd 并不再让配置发变量。
 > **1.4.2 移除输入框的「回退」按钮及其作用**（后端路由、`/rewind` 命令、3 条补丁一起删），补丁总数 82 → 79。
+> **1.5.5 应用成功后自己重启**：apply 路由在补丁全部写入、没有硬失败时直接调 `scheduleRestart`，不再靠前端弹窗（以前弹窗不出现就只能手动关终端重开）。
 > **1.5.4 点应用后一定给得出重启入口**：`scheduleRestart()` 现在如实返回 `restarting:true`（以前返回 undefined，前端据此当没开始）；apply 响应在没有硬失败时也一律带重启入口。
 > **1.5.3 重启助手全程留痕**：每一步（端口释放、杀旧进程、spawn、抓地址、判定）都写进 `$TMPDIR/dsh-purge-restart-*.err.log`，失败不用再猜。
 > **1.5.2 修掉「应用后重启不回来」**：重启助手的输出改走日志文件（不再用管道），助手退出后新宿主不会因 EPIPE 自杀；只有端口持续可连才算启动成功。

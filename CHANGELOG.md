@@ -7,6 +7,32 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.5 — 「应用」成功后自己重启，不再等弹窗
+
+### 现象
+
+点「应用」，补丁确实写进了宿主（`applied.json` 有记录），但进程没换，得自己关终端重开。日志里连一条 `dsh-purge-restart-*.err.log` 都没有——说明重启助手压根没被调用。
+
+### 根因
+
+HTTP 的 apply 路由**从来不调 `scheduleRestart`**。它只做三件事：算 `shouldRestart`、设 `bootFullQuit = true`、返回 `restarting`，然后**指望前端弹窗**让用户点「现在重启」。前端不弹（或弹了没被点到），这一步就永远不发生。
+
+### 变化
+
+`POST /dsh-purge/apply` 在补丁全部写进宿主、没有硬失败时，**直接** `hostctl.scheduleRestart(request, ctx)`：助手立刻起新宿主，并用新 token 打开页面。弹窗逻辑保留为兜底，但不再是唯一路径。
+
+| 判定 | 行为 |
+| --- | --- |
+| `summary.failed.length === 0` 且非密封桌面 | 立即重启（本次新增） |
+| 有硬失败 | 不重启，照旧给出错误提示 |
+| 密封桌面（asar） | 仍走原来的换包流程 |
+
+### 验证
+
+1.5.3/1.5.4 已证明助手本身可用（真实日志：366ms 释放端口 → 3418ms 抓到新地址 → 6440ms 判定 up）。本版只是把这个助手接到「应用」这条路上。
+
+---
+
 ## 1.5.4 — 点「应用」之后一定给得出重启入口
 
 ### 现象
