@@ -2213,7 +2213,9 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 				h("p", { className: "dshp-block-hint" }, t("apply.hint")),
 				s && !s.ai_base ? h("p", { className: "dshp-block-hint", style: { color: "var(--dshp-bad)" } }, hostText(t, "warn.noRoot", hostSurface)) : null,
 				s && s.ai_base && s.override_status === "missing" ? h("p", { className: "dshp-block-hint" }, t("warn.noInject")) : null,
-				askRestart ? h(RestartAsk, {
+				/* Web 面不再弹这个窗：1.5.5 起 apply 自己就重启了，弹窗只会挡住结果。
+				 * 桌面（密封 asar 换包）仍需要用户确认，所以只在非 web 面渲染。 */
+				askRestart && hostSurface !== "web" ? h(RestartAsk, {
 					t: t,
 					theme: detectHostTheme(),
 					onLater: () => {
