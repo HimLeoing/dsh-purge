@@ -7,6 +7,44 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.2 — 修掉「应用后重启：旧进程关了，新进程没起来」
+
+### 现象
+
+点「应用」后旧宿主正常退出，但新的 `dsh web` 没有起来，页面打不开。
+
+### 根因
+
+`lib/restart-web.js` 这个 detached 助手用管道接住新宿主的输出，靠匹配 `dsh web: http://…` 拿带 token 的地址：
+
+```js
+stdio: ["ignore", "pipe", "pipe"]   // ← 问题在这
+```
+
+它抓到 URL 后就 `process.exit(0)`。助手一退，管道读端消失，新宿主下一次 `console.log`（0.2.2 的插件加载日志比 0.2.1 多得多）就是 EPIPE，Node 按未捕获错误处理 → 新宿主直接死掉。
+
+实测复现（3099 端口，同一套流程）：
+
+| 版本 | helper 退出 8 秒后 |
+| --- | --- |
+| 1.5.1（pipe） | 端口消失，进程已死 |
+| 1.5.2（文件 fd） | 仍在 `LISTEN`，进程存活 |
+
+### 修法（照 `dsh-market` 的 `lib/restart.js`）
+
+| 变化 | 说明 |
+| --- | --- |
+| `stdio: ["ignore", outFd, errFd]` | 输出落到 `$TMPDIR/dsh-purge-restart-<stamp>.{out,err}.log`，不再走管道，助手退出也不会中断 |
+| 从日志文件读 URL | 每 200ms 轮询日志文件匹配 `dsh web: http://…`，拿到带 token 的地址再开浏览器 |
+| 等端口「持续可连」再退出 | 3 秒稳定窗口；绑定过一次不算数（激活审计失败会先绑后退） |
+| 打开日志失败时降级 `ignore` | 绝不再退回管道 |
+
+### 排障
+
+重启失败时去 `$TMPDIR` 找 `dsh-purge-restart-*.out.log` / `.err.log`，新宿主的完整启动输出都在里面。
+
+---
+
 ## 1.5.1 — 设置导航图标改走 dsh 0.2.2 的官方槽位
 
 dsh 0.2.2 新增了 `settings.section.icon`，并且把每个 section 行渲染成 `<span class="navIcon">{slot || navIcon(id)}</span>`，未知 id 落回齿轮。1.5.0 的客户端仍用老的 CSS mask 自插方案（`installSettingsNavIcon`），于是在 0.2.2 上导航行同时出现 **齿轮（宿主画的）+ 锁（插件补的）** 两个图标。

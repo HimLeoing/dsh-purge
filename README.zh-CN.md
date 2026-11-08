@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.5.1 · 本分支 fork</strong> · 适配 DSH <strong>0.2.2-rc.1</strong></p>
+<p align="center"><strong>Version 1.5.2 · 本分支 fork</strong> · 适配 DSH <strong>0.2.2-rc.1</strong></p>
 
 > **这是 fork，不是上游。** 原项目：[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)，原作者 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)），MIT 许可证（`Copyright (c) 2026 小杨`，本仓库原样保留）。
 > 本分支由 **[@JeffKeeping](https://github.com/JeffKeeping)** 维护，只做 **0.2.1 / 0.2.2 适配 + 破甲内核升级 + 界面重做 + 补丁锚点修复**，不改变插件用途与能力范围。
@@ -12,6 +12,7 @@
 > 1.4.0 的审批档位 / 审计流水 / 严格 JSON / 修订号借鉴了 [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5)，来源与边界见 [NOTICE.md](NOTICE.md)。
 > **1.4.1 修掉「装完就报 unknown prompt variable {{cwd}}」**：0.2.1 只注册 provider / model，本插件已补注册 cwd 并不再让配置发变量。
 > **1.4.2 移除输入框的「回退」按钮及其作用**（后端路由、`/rewind` 命令、3 条补丁一起删），补丁总数 82 → 79。
+> **1.5.2 修掉「应用后重启不回来」**：重启助手的输出改走日志文件（不再用管道），助手退出后新宿主不会因 EPIPE 自杀；只有端口持续可连才算启动成功。
 > **1.5.1 修掉设置导航的双图标**：改用 dsh 0.2.2 的 `settings.section.icon` 官方槽位，不再额外自插一个锁。
 > **1.5.0 适配 dsh 0.2.2-rc.1**：0.2.2 重拆了包（PTC 执行器、审批流水线、deliverable 提示词、deleteIntent），1.4.3 有 6 条锚点失配、1 条半应用；本版全部对齐，并新增 #91 删除意图放行。详见 [CHANGELOG](CHANGELOG.md)。
 > **1.4.3 恢复「插话发送」**：回滚 1.4.2 里把 prompt() 一律改成 followup 的两个补丁（#85/#86），并新增 #90 真正闩锁 running 态的唤醒，turn 收尾窗口的消息不再滞留。
