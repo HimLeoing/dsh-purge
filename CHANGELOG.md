@@ -7,6 +7,33 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.1 — 设置导航图标改走 dsh 0.2.2 的官方槽位
+
+dsh 0.2.2 新增了 `settings.section.icon`，并且把每个 section 行渲染成 `<span class="navIcon">{slot || navIcon(id)}</span>`，未知 id 落回齿轮。1.5.0 的客户端仍用老的 CSS mask 自插方案（`installSettingsNavIcon`），于是在 0.2.2 上导航行同时出现 **齿轮（宿主画的）+ 锁（插件补的）** 两个图标。
+
+`dsh-market` 1.73.x 用的是同一套解法，本版照它的写法对齐。
+
+### 修复
+
+| 位置 | 变化 |
+| --- | --- |
+| `client.js` | 新增 `PurgeNavIcon`，通过 `settings.section.icon`（`id: "dsh-purge"`）注册，直接顶替默认齿轮 |
+| `client.js` | 只有宿主**没有**声明该槽位时（0.2.1 及更早），才退回 CSS mask 自插；两个方案互斥 |
+| `client.js` | `installSettingsNavIcon` 改为 `return ctx.effect(...)`，兜底方案现在可被正确卸载 |
+
+### 效果
+
+导航栏的 Purge 只剩一个锁图标；旧宿主行为不变。
+
+### 验证
+
+- `node --check client.js` 通过
+- 宿主 `dsh-client-ui-settings-general` 的 `renderSlot("settings.section.icon", …, { only: row.id, fallback: navIcon(row.id) })` 会按 id 命中我们的注册，fallback 齿轮不再出现
+
+> 需要在重启 dsh（或刷新页面）后生效 —— client bundle 是启动时加载的。
+
+---
+
 ## 1.5.0 — 适配 DeepSeek Harness **0.2.2-rc.1**
 
 `dshTarget` 从 `0.2.1-rc.2` 抬到 `0.2.2-rc.1`。0.2.2 把几个包重新拆分了（PTC 执行器独立成包、审批流水线拆出 `lib/pipeline.js`、deliverable 提示词独立成包、`editIntent`/`deleteIntent` 抽出公共 `requirePresent()`），导致 1.4.3 的 6 条锚点整条失配、1 条变成**半应用**。本版把锚点全部对齐，并把 0.2.2 新增的删除门也纳入清洗范围。

@@ -3090,7 +3090,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 
 		function installSettingsNavIcon(ctx, resolveLabel) {
 			if (typeof document === "undefined" || !ctx || typeof ctx.effect !== "function") return;
-			ctx.effect(() => {
+			return ctx.effect(() => {
 				const tag = document.createElement("style");
 				tag.dataset.plugin = "dsh-purge";
 				tag.dataset.pluginCss = "dsh-purge/settings-nav-icon";
@@ -3163,6 +3163,39 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 					}
 				};
 			}, "dsh-purge: settings nav icon");
+		}
+
+		/* dsh 0.2.2 added a real icon seat (settings.section.icon) and paints every
+		 * section row as <span class="navIcon">{slot || navIcon(id)}</span>, so the
+		 * CSS-mask stand-in above draws a *second* glyph beside the host one (lock +
+		 * gear). Register the lock through the seat instead and keep the stand-in
+		 * only for hosts that never declare it. */
+		function PurgeNavIcon(props) {
+			const size = (props && props.size) || 16;
+			return h(
+				"svg",
+				{
+					xmlns: "http://www.w3.org/2000/svg",
+					viewBox: "0 0 24 24",
+					width: size,
+					height: size,
+					fill: "currentColor",
+					"aria-hidden": "true",
+					focusable: "false",
+				},
+				h("path", {
+					key: "body",
+					d: "M6.9 10.1h10.2a2 2 0 0 1 2 2v7.1a2 2 0 0 1-2 2H6.9a2 2 0 0 1-2-2v-7.1a2 2 0 0 1 2-2Zm5.1 2.7a1.5 1.5 0 0 0-.75 2.8v1.5a.75.75 0 0 0 1.5 0v-1.5A1.5 1.5 0 0 0 12 12.8Z",
+				}),
+				h("path", {
+					key: "shackle",
+					fill: "none",
+					stroke: "currentColor",
+					strokeWidth: 2,
+					strokeLinecap: "round",
+					d: "M8.2 10.1V7.6a3.9 3.9 0 0 1 7.1-2.3",
+				})
+			);
 		}
 
 		function SettingsPage(props) {
@@ -8726,7 +8759,21 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 				locale: NS,
 				inject: () => ({ t }),
 			}, SettingsPage));
-			installSettingsNavIcon(ctx, () => t("page.nav"));
+			/* 0.2.2 起宿主真的会给图标位：注册进 settings.section.icon 就顶替默认齿轮；
+			   旧宿主没有这个 slot，inject 回调不会跑，才退回 CSS mask 自画。 */
+			let stopNavStandIn;
+			let hostPaintsNavIcon = false;
+			ctx.slots.inject("settings.section.icon", () => {
+				hostPaintsNavIcon = true;
+				if (typeof stopNavStandIn === "function") stopNavStandIn();
+				stopNavStandIn = void 0;
+				const off = ctx.slots.register({
+					name: "settings.section.icon",
+					id: "dsh-purge",
+				}, (owner = {}) => h(PurgeNavIcon, { size: owner.size ?? 16 }));
+				return typeof off === "function" ? off : () => {};
+			});
+			if (!hostPaintsNavIcon) stopNavStandIn = installSettingsNavIcon(ctx, () => t("page.nav"));
 			/* 会话内只留三个必要件：首启提示、演练台浮窗（授权流程还要用）、发送前的环境门禁。
 			 * 右下角启动按钮 / 首页模式旁 / 会话标题旁那三个「dsh-purge」入口全部撤掉——
 			 * 界面只有设置里那一处，不再往对话界面塞按钮。 */

@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.5.0 · fork</strong> · targets DSH <strong>0.2.2-rc.1</strong></p>
+<p align="center"><strong>Version 1.5.1 · fork</strong> · targets DSH <strong>0.2.2-rc.1</strong></p>
 
 > **This is a fork, not upstream.** Original project: [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) by **小杨** ([@YuJunZhiXue](https://github.com/YuJunZhiXue)), MIT licence (`Copyright (c) 2026 小杨`, kept verbatim here).
 > This branch is maintained by **[@JeffKeeping](https://github.com/JeffKeeping)** and only adds **0.2.1 / 0.2.2 compatibility, a stronger prompt kernel, a rebuilt UI, and patch-anchor fixes**. It does not change what the plugin does.
@@ -12,6 +12,7 @@
 > 1.4.0 borrows the approval tier, audit trail, strict JSON boundary and revision guard from [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5); scope and boundaries in [NOTICE.md](NOTICE.md).
 > **1.4.1 fixes the unknown prompt variable {{cwd}} crash on install**: 0.2.1 registers provider/model only, so this plugin now registers cwd itself and stops emitting the variable from config.
 > **1.4.2 removes the input-box rewind button and all of its machinery** (backend routes, `/rewind` command, 3 patches): 82 patches -> 79.
+> **1.5.1 removes the duplicate settings-nav icon**: registers through dsh 0.2.2s `settings.section.icon` seat instead of injecting a second glyph.
 > **1.5.0 targets dsh 0.2.2-rc.1**: 0.2.2 re-split several packages (PTC executor, approval pipeline, deliverable prompt, deleteIntent), which broke 6 anchors and left 1 half-applied in 1.4.3. All are realigned here, plus new #91 for deletion intent. See [CHANGELOG](CHANGELOG.md).
 > **1.4.3 restores steer delivery**: reverts the two 1.4.2 patches that forced every prompt to followup (#85/#86) and adds #90, which latches wakes during the running phase so turn-tail messages are no longer stranded.
 > Changes and attribution: [NOTICE.md](NOTICE.md). Preconditions, no-warranty and legal terms: [DISCLAIMER.md](DISCLAIMER.md).
