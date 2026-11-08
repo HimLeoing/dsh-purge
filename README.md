@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.5.3 · fork</strong> · targets DSH <strong>0.2.2-rc.1</strong></p>
+<p align="center"><strong>Version 1.5.4 · fork</strong> · targets DSH <strong>0.2.2-rc.1</strong></p>
 
 > **This is a fork, not upstream.** Original project: [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) by **小杨** ([@YuJunZhiXue](https://github.com/YuJunZhiXue)), MIT licence (`Copyright (c) 2026 小杨`, kept verbatim here).
 > This branch is maintained by **[@JeffKeeping](https://github.com/JeffKeeping)** and only adds **0.2.1 / 0.2.2 compatibility, a stronger prompt kernel, a rebuilt UI, and patch-anchor fixes**. It does not change what the plugin does.
@@ -12,6 +12,7 @@
 > 1.4.0 borrows the approval tier, audit trail, strict JSON boundary and revision guard from [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5); scope and boundaries in [NOTICE.md](NOTICE.md).
 > **1.4.1 fixes the unknown prompt variable {{cwd}} crash on install**: 0.2.1 registers provider/model only, so this plugin now registers cwd itself and stops emitting the variable from config.
 > **1.4.2 removes the input-box rewind button and all of its machinery** (backend routes, `/rewind` command, 3 patches): 82 patches -> 79.
+> **1.5.4 always offers the restart entry after Apply**: `scheduleRestart()` now reports `restarting:true` instead of returning undefined, and the Apply response carries the entry whenever nothing hard-failed.
 > **1.5.3 makes the restart helper verbose**: every step (port release, old-process signal, spawn, address capture, verdict) lands in `$TMPDIR/dsh-purge-restart-*.err.log`.
 > **1.5.2 fixes the post-apply restart never coming back**: the helper writes the new host output to a log file instead of a pipe, so the child no longer dies on EPIPE when the helper exits; success now means the port stayed answerable.
 > **1.5.1 removes the duplicate settings-nav icon**: registers through dsh 0.2.2s `settings.section.icon` seat instead of injecting a second glyph.

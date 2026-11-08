@@ -7,6 +7,41 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.4 — 点「应用」之后一定给得出重启入口
+
+### 现象
+
+点「应用」后补丁确实写进了宿主，但界面没有任何「现在重启」的选项，只能自己关掉终端重开。
+
+### 两个独立的断点
+
+1. **`web.js` 的 `scheduleRestart()` 没有返回值。** `/dsh-purge/restart` 路由按返回值算 `restarting`，拿到 `undefined` 就写 `restarting: false` —— 实测响应正是 `{"ok":true,…,"restarting":false}`，而助手其实已经启动并在 6.4 秒内把新宿主拉了起来。前端拿到 `restarting:false` 就当「没开始」，既不等待也不提示。
+2. **apply 的响应是裸的 `shouldRestart`。** 补丁全部 `already`（`appliedCount = 0`）而 `complete` 又被某一项判否时，`shouldRestart` 为 false，前端 `setAskRestart(false)` 直接把重启入口收起来。
+
+### 变化
+
+| 位置 | 变化 |
+| --- | --- |
+| `lib/web.js` | `scheduleRestart()` 返回 `{ restarting: true, surface: "web" }` |
+| `lib/index.js` | apply 响应改成 `restarting: shouldRestart || complete || summary.failed.length === 0` —— 只要这次 apply 没有硬失败，就一定给前端重启入口 |
+
+自动重启（`restart_after_apply`）的判定没有放宽，仍然只在真正需要时由服务端直接拉起。
+
+### 验证
+
+1.5.3 的真实重启日志（`$TMPDIR/dsh-purge-restart-2026-11-08T07-55-20.err.log`）：
+
+```
+port 3080 is free after 366ms; starting the replacement
+replacement spawned (pid 81449)
+captured the new address after 3418ms
+replacement up (steady for 3000ms after 6440ms)
+```
+
+重启链路本身是通的，本版只修「有没有入口／有没有如实回报」。
+
+---
+
 ## 1.5.3 — 重启助手改为全程留痕
 
 1.5.2 修掉了管道导致的 EPIPE，但助手失败时仍然是**完全静默**的：它 detached 运行、`stdio: "ignore"`，出问题既没有终端输出也没有日志，只能靠猜。
