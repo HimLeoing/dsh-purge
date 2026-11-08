@@ -7,6 +7,35 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.3 — 重启助手改为全程留痕
+
+1.5.2 修掉了管道导致的 EPIPE，但助手失败时仍然是**完全静默**的：它 detached 运行、`stdio: "ignore"`，出问题既没有终端输出也没有日志，只能靠猜。
+
+### 变化
+
+`lib/restart-web.js` 现在每一步都追加写进 `$TMPDIR/dsh-purge-restart-<stamp>.err.log`：
+
+| 记录点 | 内容 |
+| --- | --- |
+| 启动 | helper pid、port、host、旧 pid、execPath、argv、cwd、两份日志的路径 |
+| 等端口 | 端口释放耗时；超过 40 次探测直接放弃并记录 |
+| 杀旧进程 | 发出的信号、失败原因（通常旧进程已经自己退了） |
+| spawn | 新宿主 pid；同步抛错 / 异步 `error` 事件都会记下 |
+| 抓地址 | 抓到时耗（token 打码后记录）；20 秒抓不到就指向 `.out.log` |
+| 收尾 | 新宿主的判定：`up (steady for 3000ms after Nms)` 或 `timed out` |
+
+### 排障
+
+点「应用／重启」没回来后，直接看：
+
+```bash
+ls -t $TMPDIR/dsh-purge-restart-*.err.log | head -1 | xargs cat
+```
+
+`.out.log` 里是新宿主自己的完整启动输出 —— 那才是它为什么没起来的一手证据。
+
+---
+
 ## 1.5.2 — 修掉「应用后重启：旧进程关了，新进程没起来」
 
 ### 现象
