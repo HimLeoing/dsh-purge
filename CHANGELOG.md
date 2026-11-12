@@ -7,6 +7,44 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.5.7 — 适配 DeepSeek Harness **0.2.2-rc.2**，并修好红队模式
+
+`dshTarget` 从 `0.2.2-rc.1` 抬到 `0.2.2-rc.2`。rc.2 又改了三处签名，导致 4 条补丁整条失配；红队预设则被 rc.2 的两条新限制判成 `broken`，在模式下拉里根本选不了。
+
+### 补丁锚点（4 条）
+
+| 补丁 | rc.2 里的变化 | 修法 |
+| --- | --- | --- |
+| **#13** `ESCALATION_WIDENING_EXEMPT` | 三行 `throw new Error(...)` 变成 `throw new SandboxEscalationError(..., "SANDBOX_ESCALATION_*")` | 新增带错误码的 pattern |
+| **#35** `ESCALATION_NEVER_REJECT` | 同一个 switch 全换成 `SandboxEscalationError`，`cancelled` 分支多了一句 `approval.signal?.throwIfAborted()` | 新增对应 pattern |
+| **#18** `REPEAT_TOOL_REMINDER_DISABLED` | `tools/post-execute` 钩子不再区分 `kind === "block"`，直接展开 downstream | 新增简化版 pattern |
+| **#62** `OFFICIAL_TOOL_ASK_FAILOPEN` | 拒绝理由改走 `approvalDenial(reason, APPROVAL_*)`；`lib` 与 `types` 两个模块各一套 | 新增 4 条 pattern（tab/四空格、`void 0`/`undefined`） |
+
+应用结果：web 面 **67 applied · 2 skipped（#80/#86 回滚型）· 1 missing_file（#71 未装两神预设）**。
+
+### 红队模式
+
+`$DSH_HOME/redteam/preset-declare.json` 里记着：
+
+```
+phase: registered-broken
+broken: tool-subagent-list-agents ...: never started
+        tool-subagent: toolFilter is no longer supported; configure persona and tool
+        plugins in an Agent Preset and select it with agentPreset (spawn only)
+```
+
+两个都是 rc.2 的收紧：
+
+| 问题 | rc.2 的事实 | 修法 |
+| --- | --- | --- |
+| `@deepseek-ai/dsh-tool-subagent-control/list-agents` | 该包 `exports` 只剩 `.` / `./src/*` / `./package.json` / `./locale/*`，**没有 `/list-agents` 子路径** | 整条从预设里删掉 |
+| `tool-subagent.config.toolFilter` | `apply()` 第一行就抛错：`persona` 与 `toolFilter` 都不再支持 | 删掉 `toolFilter` 段；叶子节点改由 `maxDepth: 1` 兜底 |
+| `modelSelectionSettings: true` | rc.2 的 Config 键叫 `modelSelection` | 改名 |
+
+预设模板（`presets/redteam/agent.cordis.yml`）和已安装的 `$DSH_HOME/.agent-presets/redteam/agent.cordis.yml` 都改了，重装不会再被旧模板覆盖。
+
+---
+
 ## 1.5.6 — 去掉 Web 面的「要现在重启吗」弹窗
 
 1.5.5 起 apply 路由写完补丁就自己重启，那个弹窗已经没有存在的意义：它只会在结果出来前挡住页面，而且在部分宿主面点下去请求根本发不出去。

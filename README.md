@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness cybersecurity red-team tool (dsh-purge)</h1>
 
-<p align="center"><strong>Version 1.5.6 · fork</strong> · targets DSH <strong>0.2.2-rc.1</strong></p>
+<p align="center"><strong>Version 1.5.7 · fork</strong> · targets DSH <strong>0.2.2-rc.2</strong></p>
 
 > **This is a fork, not upstream.** Original project: [YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge) by **小杨** ([@YuJunZhiXue](https://github.com/YuJunZhiXue)), MIT licence (`Copyright (c) 2026 小杨`, kept verbatim here).
 > This branch is maintained by **[@JeffKeeping](https://github.com/JeffKeeping)** and only adds **0.2.1 / 0.2.2 compatibility, a stronger prompt kernel, a rebuilt UI, and patch-anchor fixes**. It does not change what the plugin does.
@@ -12,6 +12,7 @@
 > 1.4.0 borrows the approval tier, audit trail, strict JSON boundary and revision guard from [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5); scope and boundaries in [NOTICE.md](NOTICE.md).
 > **1.4.1 fixes the unknown prompt variable {{cwd}} crash on install**: 0.2.1 registers provider/model only, so this plugin now registers cwd itself and stops emitting the variable from config.
 > **1.4.2 removes the input-box rewind button and all of its machinery** (backend routes, `/rewind` command, 3 patches): 82 patches -> 79.
+> **1.5.7 targets dsh 0.2.2-rc.2 and fixes red-team mode**: four anchors follow the new rc.2 signatures; the red-team preset drops the removed `toolFilter` and `list-agents` subpath, and `modelSelectionSettings` becomes `modelSelection`.
 > **1.5.6 drops the Web restart dialog**: Apply restarts by itself now, so the modal only stood between the user and the result.
 > **1.5.5 Apply restarts on its own**: the apply route calls `scheduleRestart` directly once every patch is written and nothing hard-failed, instead of relying on a modal the user may never see.
 > **1.5.4 always offers the restart entry after Apply**: `scheduleRestart()` now reports `restarting:true` instead of returning undefined, and the Apply response carries the entry whenever nothing hard-failed.
@@ -32,7 +33,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.2-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">

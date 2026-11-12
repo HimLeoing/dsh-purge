@@ -4,7 +4,7 @@
 
 <h1 align="center">⚔️ DeepSeek Harness 网络安全红队工具（dsh-purge）</h1>
 
-<p align="center"><strong>Version 1.5.6 · 本分支 fork</strong> · 适配 DSH <strong>0.2.2-rc.1</strong></p>
+<p align="center"><strong>Version 1.5.7 · 本分支 fork</strong> · 适配 DSH <strong>0.2.2-rc.2</strong></p>
 
 > **这是 fork，不是上游。** 原项目：[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)，原作者 **小杨**（[@YuJunZhiXue](https://github.com/YuJunZhiXue)），MIT 许可证（`Copyright (c) 2026 小杨`，本仓库原样保留）。
 > 本分支由 **[@JeffKeeping](https://github.com/JeffKeeping)** 维护，只做 **0.2.1 / 0.2.2 适配 + 破甲内核升级 + 界面重做 + 补丁锚点修复**，不改变插件用途与能力范围。
@@ -12,6 +12,7 @@
 > 1.4.0 的审批档位 / 审计流水 / 严格 JSON / 修订号借鉴了 [Minglink/dsh-infinite-gen-5](https://github.com/Minglink/dsh-infinite-gen-5)，来源与边界见 [NOTICE.md](NOTICE.md)。
 > **1.4.1 修掉「装完就报 unknown prompt variable {{cwd}}」**：0.2.1 只注册 provider / model，本插件已补注册 cwd 并不再让配置发变量。
 > **1.4.2 移除输入框的「回退」按钮及其作用**（后端路由、`/rewind` 命令、3 条补丁一起删），补丁总数 82 → 79。
+> **1.5.7 适配 dsh 0.2.2-rc.2，并修好红队模式**：4 条补丁跟上 rc.2 的新签名；红队预设去掉 rc.2 已移除的 `toolFilter` 与 `list-agents` 子路径，`modelSelectionSettings` 改名 `modelSelection`。
 > **1.5.6 去掉 Web 面的重启弹窗**：apply 自己就重启了，弹窗只会在结果出来前挡住页面。
 > **1.5.5 应用成功后自己重启**：apply 路由在补丁全部写入、没有硬失败时直接调 `scheduleRestart`，不再靠前端弹窗（以前弹窗不出现就只能手动关终端重开）。
 > **1.5.4 点应用后一定给得出重启入口**：`scheduleRestart()` 现在如实返回 `restarting:true`（以前返回 undefined，前端据此当没开始）；apply 响应在没有硬失败时也一律带重启入口。
@@ -32,7 +33,7 @@
   <a href="https://github.com/YuJunZhiXue/dsh-purge/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
   <a href="https://awesome-dsh-plugin.com"><img src="https://awesome-dsh-plugin.com/badge.svg" alt="awesome · DSH plugin"></a>
   <a href="https://deepseek.stream/plugins/dsh-purge"><img src="https://img.shields.io/badge/Hub-dsh--purge-1a73e8" alt="DeepSeek Harness Hub"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.1-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.2-blue" alt="DSH"></a>
   <br>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
