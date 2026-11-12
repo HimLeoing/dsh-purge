@@ -7,6 +7,53 @@ Baseline: **1.2.0**. Everything below is what this fork adds, improves, or fixes
 
 ---
 
+## 1.6.0 — 独立仓库、59/59、应用后不再报「读取失败」
+
+### 仓库
+
+本项目自此**独立维护**：`HimLeoing/dsh-purge-plus` 是 GitHub 上的 fork，而 fork 关系无法解除（`"fork": true` 在创建时就写死了）。所以 1.6.0 起换到新建的非 fork 仓库 **`HimLeoing/dsh-purge`**，提交历史与 tag 全部保留。
+
+`repository` / `homepage` / `bugs` / `dsh.install` 与 README 里的所有链接都指向新仓库。
+
+### 补丁表：79 条，59/59
+
+删掉两条长期跳过项，它们已经没有维护价值：
+
+| 删掉 | 原因 |
+| --- | --- |
+| **#71** `LIANGSHEN_IDENTITY_LINE` | 目标是「两神」预设的 `preset-liangshen`，没装就是 `missing_file`，装了才命中 |
+| **#80** `MINIMAL_OFFICIAL_TOOLSET` | 回滚型：只撤 1.4.2 自己往 minimal 预设里加过的行，干净宿主必然不命中 |
+
+删除后 web 面 **59 个可见补丁全部 applied**，没有跳过、没有缺失文件。仍保留的两条回滚型补丁（#85/#86 链上的 #86）与已应用的兄弟项合并显示，不单独计数。
+
+### 修掉「点应用后报读取失败」
+
+1.5.5 起 apply 成功就直接重启宿主，但前端仍在 apply 返回后立刻读 `/dsh-purge/status`。旧进程正在退出，这个请求必然失败，于是界面把一次正常重启显示成：
+
+```
+读取失败: 连不上接口，请确认 dsh 还在跑后 Ctrl+F5
+未定位到当前宿主的 @deepseek-ai，清洗不会生效
+```
+
+修法：
+
+| 位置 | 变化 |
+| --- | --- |
+| `client.js` apply 分支 | `d.restarting` 为真时不再 `loadAll()`，直接显示「正在重启」，15 秒后兜底重试一次 |
+| `client.js` `loadAll` 的 catch | 新增 `restartPending` 标志；重启期间的任何 `status` 失败都静默丢弃，不重置 state、不弹红字 |
+
+### 文档
+
+README 全部重写（中英各一份）：
+
+- 只保留**上游原作者**「小杨 / @YuJunZhiXue」的署名，去掉 fork 链上另一位维护者的信息
+- 删除「Unauthorized commercial use」「违规商用公示」「Non-profit public project」整节及其截图
+- 删除赞助段与所有旧截图（`docs/notice/`、`docs/preview/` 整目录移除）
+- `docs/banner.svg` 换成新绘制的版本
+- 补齐 0.2.2-rc.2 的适配说明、安装（含 `allowBuilds`）、四个按钮的实际行为、红队模式排障路径
+
+---
+
 ## 1.5.7 — 适配 DeepSeek Harness **0.2.2-rc.2**，并修好红队模式
 
 `dshTarget` 从 `0.2.2-rc.1` 抬到 `0.2.2-rc.2`。rc.2 又改了三处签名，导致 4 条补丁整条失配；红队预设则被 rc.2 的两条新限制判成 `broken`，在模式下拉里根本选不了。

@@ -1627,6 +1627,9 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 			const [updateJob, setUpdateJob] = useState(null);
 			const [askRestart, setAskRestart] = useState(false);
 			const suppressRestartAsk = useRef(false);
+			/* apply 之后服务端会自己拉新宿主；这期间任何 /dsh-purge/status 都会连不上，
+			 * 那是正常重启，不是读取失败。 */
+			const restartPending = useRef(false);
 			const [askUninstall, setAskUninstall] = useState(false);
 			const [uninstallBusy, setUninstallBusy] = useState(false);
 			const [notice, setNotice] = useState({ kind: "idle", text: "" });
@@ -1802,6 +1805,7 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 						}
 					})
 					.catch((e) => {
+						if (restartPending.current) return;
 						setState({ ok: false, patches_total: 0, patches_applied: 0, patch_status: {}, shim_cmd: "n/a", shim_ps1: "n/a", shim_bin: "n/a", has_backup: false });
 						setNotice({ kind: "error", text: tr("err.status", { error: e.message }) });
 					});
@@ -1928,14 +1932,25 @@ body:not([data-ds-dark-theme]) .dshp-auth-legal{background:var(--dsw-alias-bg-la
 								return;
 							}
 							if (action === "apply") {
+								/* 服务端在写完补丁后就自己拉新宿主了（1.5.5 起）。这时候再读
+								 * /dsh-purge/status 必然连不上——旧进程正在退出，于是界面把一次
+								 * 正常的重启报成「读取失败：连不上接口」，还把 state 重置成
+								 * 没有 ai_base，顺带又冒出「未定位到当前宿主」的红字。
+								 * 所以：要重启就不读，直接显示正在重启，等页面被新宿主替换。 */
+								if (d.restarting) {
+									restartPending.current = true;
+									setNotice({ kind: "ok", text: hostText(tr, "restarting", hostSurfaceOf(state)) });
+									setPatchBusy(true);
+									window.setTimeout(() => {
+										try { loadAll(); } catch { /* 页面可能已被替换 */ }
+										setPatchBusy(false);
+									}, 15000);
+									setAskRestart(false);
+									return;
+								}
 								setNotice({ kind: "ok", text: tr("ok.done") });
 								loadAll();
-								if (d.restarting || d.needs_full_quit) {
-									suppressRestartAsk.current = false;
-									setAskRestart(true);
-								} else {
-									setAskRestart(false);
-								}
+								setAskRestart(false);
 								return;
 							}
 							setNotice({ kind: "ok", text: tr("ok.done") });
