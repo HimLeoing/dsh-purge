@@ -4,12 +4,12 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.6.0</strong> · targets DSH <strong>0.2.2-rc.2</strong></p>
+<p align="center"><strong>Version 1.6.1</strong> · targets DSH <strong>0.2.2-rc.3</strong></p>
 
 <p align="center">
   <a href="https://github.com/HimLeoing/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/HimLeoing/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/HimLeoing/dsh-purge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.3-blue" alt="DSH"></a>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
 </p>
@@ -38,13 +38,13 @@ dsh-purge does two things when DeepSeek Harness boots:
 
 There are **79 patches**, grouped into prompt / code / tools / 0.2.x compatibility. A patch whose anchor no longer matches is reported as skipped, never force-written; rollback patches (which undo what an older version of this plugin wrote) always skip on a clean host — that is their job.
 
-On 0.2.2-rc.2 the result is **59 of 59 applied** (the permanently-skipped rows are gone from the table now).
+On 0.2.2-rc.3 the result is **59 of 59 applied** (the permanently-skipped rows are gone from the table now).
 
 ## Supported hosts
 
 | DSH version | Use |
 | --- | --- |
-| **0.2.2-rc.2** | this release (1.6.0) |
+| **0.2.2-rc.3** | this release (1.6.1) |
 | 0.2.2-rc.1 / 0.2.1 line | 1.5.x |
 | 0.1.7 and older | upstream tags up to 1.1.39 |
 
@@ -54,10 +54,10 @@ Official `dsh web` and the official desktop build only. Community Desktop is not
 
 ```bash
 # straight from GitHub, pinned to a tag (recommended)
-dsh plugin --profile web add "github:HimLeoing/dsh-purge#v1.6.0"
+dsh plugin --profile web add "github:HimLeoing/dsh-purge#v1.6.1"
 
 # or via tarball
-dsh plugin --profile web add "https://github.com/HimLeoing/dsh-purge/archive/refs/tags/v1.6.0.tar.gz"
+dsh plugin --profile web add "https://github.com/HimLeoing/dsh-purge/archive/refs/tags/v1.6.1.tar.gz"
 ```
 
 Then open **Settings → Purge** and press **Apply**. A successful apply restarts the host itself and reopens the page with a fresh token.

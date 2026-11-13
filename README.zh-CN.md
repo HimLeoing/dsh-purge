@@ -4,12 +4,12 @@
 
 <h1 align="center">dsh-purge</h1>
 
-<p align="center"><strong>Version 1.6.0</strong> · 适配 DSH <strong>0.2.2-rc.2</strong></p>
+<p align="center"><strong>Version 1.6.1</strong> · 适配 DSH <strong>0.2.2-rc.3</strong></p>
 
 <p align="center">
   <a href="https://github.com/HimLeoing/dsh-purge/stargazers"><img src="https://img.shields.io/github/stars/HimLeoing/dsh-purge?logo=github&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/HimLeoing/dsh-purge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-65a30d?style=flat" alt="MIT license"></a>
-  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.2-blue" alt="DSH"></a>
+  <a href="https://www.deepseek.com/harness/"><img src="https://img.shields.io/badge/dsh-0.2.2--rc.3-blue" alt="DSH"></a>
   <img src="https://img.shields.io/badge/Node.js-%3E%3D18-339933?logo=node.js&logoColor=fff" alt="Node.js">
   <img src="https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000" alt="JavaScript">
 </p>
@@ -38,14 +38,14 @@ dsh-purge 在 DeepSeek Harness 启动时做两件事：
 
 补丁表共 **79 条**，分提示词 / 代码 / 工具 / 0.2.x 兼容四层。锚点对不上的补丁显示为跳过，不会盲目改写；回滚型补丁（例如撤回旧版本自己写进去的改动）在干净宿主上必然跳过，属正常。
 
-0.2.2-rc.2 上的实际结果：**59 项全部 applied**（跳过项已移除，不再计入）。
+0.2.2-rc.3 上的实际结果：**59 项全部 applied**（跳过项已移除，不再计入）。
 
 ## 适配范围
 
 | DSH 版本 | 用法 |
 | --- | --- |
-| **0.2.2-rc.2** | 本版（1.6.0） |
-| 0.2.2-rc.1 / 0.2.1 线 | 1.5.x |
+| **0.2.2-rc.3** | 本版（1.6.1） |
+| 0.2.2-rc.2 / rc.1 / 0.2.1 线 | 1.5.x ~ 1.6.0 |
 | 0.1.7 及更早 | 上游 1.1.39 及更早的 tag |
 
 只支持官方 `dsh web` 与官方桌面端。社区桌面端不做适配。
@@ -54,10 +54,10 @@ dsh-purge 在 DeepSeek Harness 启动时做两件事：
 
 ```bash
 # 从 GitHub 直接装（推荐，锁定 tag）
-dsh plugin --profile web add "github:HimLeoing/dsh-purge#v1.6.0"
+dsh plugin --profile web add "github:HimLeoing/dsh-purge#v1.6.1"
 
 # 或走 tarball
-dsh plugin --profile web add "https://github.com/HimLeoing/dsh-purge/archive/refs/tags/v1.6.0.tar.gz"
+dsh plugin --profile web add "https://github.com/HimLeoing/dsh-purge/archive/refs/tags/v1.6.1.tar.gz"
 ```
 
 装完打开 **设置 → Purge**，点 **应用**。应用成功后宿主会自己重启，页面会用新令牌重新打开。
