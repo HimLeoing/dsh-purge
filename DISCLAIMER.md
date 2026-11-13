@@ -60,13 +60,13 @@ The user is responsible for complying with applicable law in their own jurisdict
 - 本项目与 **DeepSeek**、DeepSeek Harness 官方团队无隶属、合作或背书关系。文中出现的产品名与商标归各自权利人所有，仅用于说明兼容对象。
 - 演练台部分沿用了上游的第三方组件与素材，其许可证与披露见 `docs/redteam-upstream-LICENSE`、`docs/redteam-upstream-DISCLOSURE`。
 
-This repository is a fork of YuJunZhiXue/dsh-purge (MIT, © 2026 小杨). It is not affiliated with, endorsed by, or partnered with DeepSeek or the DeepSeek Harness team; product names and trademarks belong to their respective owners and are used only to describe compatibility. Third-party components used by the drill console are disclosed under `docs/`.
+This repository is an independently maintained continuation of dsh-purge (MIT, © 2026 小杨). It is not affiliated with, endorsed by, or partnered with DeepSeek or the DeepSeek Harness team; product names and trademarks belong to their respective owners and are used only to describe compatibility. Third-party components used by the drill console are disclosed under `docs/`.
 
 ## 6. 权利与下架 / Rights holder and takedown
 
-若你是权利人，认为本仓库的某部分侵犯了你的权利，请通过仓库 Issue 或 GitHub 账号 [@JeffKeeping](https://github.com/JeffKeeping) 联系，并附上可核验的权属说明。核实后会在合理期限内删除或修改相应内容。
+若你是权利人，认为本仓库的某部分侵犯了你的权利，请通过仓库 Issue 或 GitHub 账号 [@HimLeoing](https://github.com/HimLeoing) 联系，并附上可核验的权属说明。核实后会在合理期限内删除或修改相应内容。
 
-If you are a rights holder and believe part of this repository infringes your rights, contact [@JeffKeeping](https://github.com/JeffKeeping) with verifiable ownership details. Verified requests will be honoured within a reasonable period.
+If you are a rights holder and believe part of this repository infringes your rights, contact [@HimLeoing](https://github.com/HimLeoing) with verifiable ownership details. Verified requests will be honoured within a reasonable period.
 
 ## 7. 版本与变更 / Version and changes
 

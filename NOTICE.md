@@ -2,16 +2,15 @@
 
 本仓库是 **[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)** 的分支（fork），不是上游官方发布。
 
-This repository is a **fork** of **[YuJunZhiXue/dsh-purge](https://github.com/YuJunZhiXue/dsh-purge)**. It is not an upstream release.
+This repository is an independently maintained continuation of **dsh-purge**. It is not an upstream release.
 
 | 项 | 内容 |
 | --- | --- |
 | 原项目 | dsh-purge — DeepSeek Harness 网络安全红队评测与「破甲」插件 |
 | 原作者 | **小杨**（GitHub: [@YuJunZhiXue](https://github.com/YuJunZhiXue)） |
-| 上游仓库 | https://github.com/YuJunZhiXue/dsh-purge |
 | 上游许可证 | MIT，`Copyright (c) 2026 小杨`（见 [LICENSE](LICENSE)，本分支原样保留） |
-| 本分支 | 由 **JeffKeeping** 维护，仅做版本适配与体验优化 |
-| 本分支版本 | 1.3.1，`dshTarget: 0.2.1-rc.2` |
+| 本仓库 | 由 **HimLeoing** 独立维护 |
+| 当前版本 | 1.6.0，`dshTarget: 0.2.2-rc.2` |
 
 上游 README 要求：**借用本项目的名称、思路、代码或提示词，必须署名并写明来源仓库**。本仓库保留原作者署名、上游链接与原始 MIT 许可证文本；这是使用条件，不是可选项。
 
